@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Photo en fond, plein écran -->
+    <div class="bg">
+        <img id="photoDisplay" src="" alt="" class="bg-photo loading">
+    </div>
+    <div class="scrim"></div>
+
+    <!-- Contenu par-dessus la photo -->
     <div class="container">
         <header>
             <h1>À La Tienne</h1>
@@ -39,11 +46,6 @@
         <div id="response" class="response hidden">
             <div id="responseContent"></div>
         </div>
-
-        <div class="photo-container">
-            <img id="photoDisplay" src="" alt="" class="photo loading">
-        </div>
-        <p class="photo-credit">Photo: Unsplash</p>
     </div>
 
     <script src="script.js"></script>
