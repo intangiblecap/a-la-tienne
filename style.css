@@ -155,6 +155,14 @@ input::placeholder {
     font-weight: 500;
 }
 
+#responseContent .detail {
+    display: inline-block;
+    margin: 6px 0;
+    font-size: 0.85rem;
+    font-weight: 400;
+    opacity: 0.85;
+}
+
 .response.success {
     background: rgba(76, 175, 80, 0.25);
     border-color: rgba(129, 199, 132, 0.6);

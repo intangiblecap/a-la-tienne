@@ -13,6 +13,39 @@ const PORT = process.env.PORT || 3000;
 const DATA_DIR = process.env.DATA_DIR || __dirname;
 const TRINQUADES_FILE = path.join(DATA_DIR, 'trinquades.json');
 
+// --- Normalisation (identique à functions/api/trinquer.js) ---
+const MOTS_VIDES = new Set([
+    'le', 'la', 'les', 'l', 'un', 'une', 'des', 'du', 'de', 'd',
+    'au', 'aux', 'the', 'a', 'an', 'of', 'et', 'à',
+]);
+
+function singulier(mot) {
+    if (mot.length > 3 && mot.endsWith('s')) {
+        return mot.slice(0, -1);
+    }
+    return mot;
+}
+
+// Compare le sens, pas l'orthographe : minuscules, sans accents,
+// sans articles, au singulier. "Les Sardines" = "sardine",
+// mais "sardines d'alice" reste différent.
+function normaliser(texte) {
+    const nettoye = texte
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .replace(/['’`]/g, ' ')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter(Boolean)
+        .filter((mot) => !MOTS_VIDES.has(mot))
+        .map(singulier)
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+    return nettoye || texte.toLowerCase().trim();
+}
+
 // Middleware
 app.use(express.json());
 app.use(cors());
@@ -55,17 +88,22 @@ app.post('/api/trinquer', (req, res) => {
     // Charger l'historique
     const data = loadTrinquades();
 
-    // Normaliser (minuscules, espaces) pour la comparaison
-    const trinquadeNorm = trinquade.toLowerCase().trim();
+    // Normaliser pour comparer le sens (voir fonction normaliser plus bas)
+    const trinquadeNorm = normaliser(trinquade);
 
     // Vérifier si on a déjà trinqué à ça
-    const alreadyTrinked = data.trinquades.some(
-        (t) => t.trinquade.toLowerCase().trim() === trinquadeNorm
+    const original = data.trinquades.find(
+        (t) => normaliser(t.trinquade) === trinquadeNorm
     );
 
-    if (alreadyTrinked) {
-        // On a déjà trinqué à ça -> Défi!
-        return res.json({ success: false, message: 'Déjà trinqué à ça!' });
+    if (original) {
+        // On a déjà trinqué à ça -> Défi! On renvoie par qui et quand.
+        return res.json({
+            success: false,
+            message: 'Déjà trinqué à ça!',
+            player: original.player || null,
+            date: original.date || null,
+        });
     }
 
     // Nouvelle trinquade! -> Enregistrer

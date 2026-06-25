@@ -41,6 +41,33 @@ function loadPhoto() {
 
 loadPhoto();
 
+// Convertit la valeur du menu déroulant en joli nom affichable
+function formatPlayer(value) {
+    const noms = {
+        sisiboubou: 'Sisiboubou',
+        alalboubou: 'Alalboubou',
+        autre: 'un autre personnage',
+    };
+    return noms[value] || value || 'quelqu\'un';
+}
+
+// Met la date ISO au format français: "12 juin 2026 à 21h30"
+function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    const date = d.toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+    const heure = d.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+    }).replace(':', 'h');
+    return `${date} à ${heure}`;
+}
+
 // Écouter la soumission du formulaire
 form.addEventListener('submit', async (event) => {
     event.preventDefault(); // Empêcher le rechargement de la page
@@ -80,9 +107,16 @@ form.addEventListener('submit', async (event) => {
             responseDiv.classList.add('success');
             responseContent.textContent = `"${trinquade}" a été enregistrée.`;
         } else {
-            // On a déjà trinqué à ça...
+            // On a déjà trinqué à ça -> on affiche par qui et quand
             responseDiv.classList.add('warning');
-            responseContent.textContent = `Vous avez déjà trinqué à "${trinquade}". Défi à venir.`;
+            let texte = `Vous avez déjà trinqué à "${trinquade}".`;
+            if (result.player || result.date) {
+                const qui = formatPlayer(result.player);
+                const quand = formatDate(result.date);
+                texte += `<br><span class="detail">Trinqué par ${qui}${quand ? ` le ${quand}` : ''}.</span>`;
+            }
+            texte += `<br>Défi à venir.`;
+            responseContent.innerHTML = texte;
         }
 
         // Charger une nouvelle photo
