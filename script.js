@@ -6,12 +6,30 @@ const responseDiv = document.getElementById('response');
 const responseContent = document.getElementById('responseContent');
 const photoDisplay = document.getElementById('photoDisplay');
 
-// Charger une photo au démarrage
+// IDs Unsplash curatés: gens qui boivent, fêtent, trinquent — style vintage/candid
+const PHOTO_IDS = [
+    '1510812431401-41d2bd2722f3', // groupe qui trinque
+    '1575037614876-c38a4d44f5b8', // coupes de champagne
+    '1541614101331-1a5a3a194e92', // cheers extérieur
+    '1527529482837-4698179dc6ce', // fête entre amis
+    '1567696153798-5a61e8f8c9c5', // verres levés
+    '1574096079513-d8259312b785', // terrasse été
+    '1558618666-fcd25c85cd64', // fête vintage
+    '1560840408-21f3ade17a60', // bar ambiance
+    '1516997121675-4c2d1684aa3e', // amis qui rient
+    '1528823872057-9c018a7a7553', // soirée joyeuse
+];
+
 function loadPhoto() {
-    const queries = ['cheers', 'drinking', 'celebration', 'people toast', 'vintage party'];
-    const randomQuery = queries[Math.floor(Math.random() * queries.length)];
-    const timestamp = Date.now(); // Cache buster
-    photoDisplay.src = `https://source.unsplash.com/random/800x1000?query=${randomQuery}&t=${timestamp}`;
+    const id = PHOTO_IDS[Math.floor(Math.random() * PHOTO_IDS.length)];
+    photoDisplay.classList.add('loading');
+    const url = `https://images.unsplash.com/photo-${id}?w=800&h=1000&fit=crop&auto=format&q=80`;
+    const img = new Image();
+    img.onload = () => {
+        photoDisplay.src = url;
+        photoDisplay.classList.remove('loading');
+    };
+    img.src = url;
 }
 
 loadPhoto();
@@ -32,7 +50,7 @@ form.addEventListener('submit', async (event) => {
 
     // Afficher un message de chargement
     responseDiv.classList.remove('hidden', 'success', 'warning');
-    responseContent.textContent = '🔄 Vérification en cours...';
+    responseContent.textContent = 'Vérification...';
 
     try {
         // Envoyer la trinquade au serveur pour vérification

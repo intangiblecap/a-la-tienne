@@ -12,10 +12,6 @@
             <h1>À La Tienne</h1>
         </header>
 
-        <div class="photo-container">
-            <img id="photoDisplay" src="" alt="Photo" class="photo">
-        </div>
-
         <form id="trinqueForm" class="form">
             <div class="form-group">
                 <label for="player">Qui trinque</label>
@@ -32,7 +28,7 @@
                 <input
                     type="text"
                     id="trinquade"
-                    placeholder="Les sardines, la bière, etc."
+                    placeholder="Les sardines, la bière..."
                     required
                 >
             </div>
@@ -43,6 +39,11 @@
         <div id="response" class="response hidden">
             <div id="responseContent"></div>
         </div>
+
+        <div class="photo-container">
+            <img id="photoDisplay" src="" alt="" class="photo loading">
+        </div>
+        <p class="photo-credit">Photo: Unsplash</p>
     </div>
 
     <script src="script.js"></script>
