@@ -1,0 +1,5 @@
+node_modules/
+.git/
+trinquades.json
+*.log
+.env

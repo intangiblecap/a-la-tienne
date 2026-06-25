@@ -9,7 +9,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Fichier secret avec l'historique (pas accesible au navigateur)
-const TRINQUADES_FILE = path.join(__dirname, 'trinquades.json');
+// Sur Fly.io, DATA_DIR pointe vers le volume persistant /data
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const TRINQUADES_FILE = path.join(DATA_DIR, 'trinquades.json');
 
 // Middleware
 app.use(express.json());
