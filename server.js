@@ -118,6 +118,27 @@ app.post('/api/trinquer', (req, res) => {
     return res.json({ success: true, message: 'Nouvelle trinquade enregistrée!' });
 });
 
+// API: défi en cours (miroir local de functions/api/defi.js)
+const DEFI_DEFAUT =
+    "Tu paies le verre à l'autre et tu le finis en moins de 20 secondes, " +
+    "sinon tu paies le prochain.\n\n" +
+    "Et si on oublie de trinquer 3 fois d'affilée : une bouteille d'1L de " +
+    "vodka Sobieski à partager dans la soirée.";
+
+app.get('/api/defi', (req, res) => {
+    const data = loadTrinquades();
+    res.json({ defi: data.defi || DEFI_DEFAUT });
+});
+
+app.post('/api/defi', (req, res) => {
+    const defi = (req.body.defi || '').trim();
+    if (!defi) return res.status(400).json({ error: 'Défi vide' });
+    const data = loadTrinquades();
+    data.defi = defi;
+    saveTrinquades(data);
+    res.json({ success: true, defi });
+});
+
 // API: Récupérer les stats (optionnel, pour plus tard)
 app.get('/api/stats', (req, res) => {
     const data = loadTrinquades();

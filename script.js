@@ -5,6 +5,28 @@ const trinquadeInput = document.getElementById('trinquade');
 const responseDiv = document.getElementById('response');
 const responseContent = document.getElementById('responseContent');
 const photoDisplay = document.getElementById('photoDisplay');
+const defiModal = document.getElementById('defiModal');
+const defiInput = document.getElementById('defiInput');
+const defiSave = document.getElementById('defiSave');
+const defiCancel = document.getElementById('defiCancel');
+
+// Probabilité d'obtenir le droit de changer le défi après une réussite.
+// 0.15 = environ 1 fois sur 7 : rare, mais pas trop, et imprévisible.
+const CHANCE_CHANGER_DEFI = 0.15;
+
+// Le défi en cours (récupéré du serveur au chargement)
+let defiActuel = '';
+
+async function chargerDefi() {
+    try {
+        const r = await fetch('/api/defi');
+        const data = await r.json();
+        defiActuel = data.defi || '';
+    } catch {
+        defiActuel = '';
+    }
+}
+chargerDefi();
 
 // Combinaisons de tags Flickr ciblant "vieux/vieille qui boit"
 const PHOTO_TAGS = [
@@ -40,6 +62,48 @@ function loadPhoto() {
 }
 
 loadPhoto();
+
+// Échappe le HTML (sécurité, évite l'injection dans la réponse)
+function escapeHtml(texte) {
+    return String(texte)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+// --- Modal "changer le défi" ---
+function ouvrirModalDefi() {
+    defiInput.value = defiActuel;
+    defiModal.classList.remove('hidden');
+}
+
+function fermerModalDefi() {
+    defiModal.classList.add('hidden');
+}
+
+defiCancel.addEventListener('click', fermerModalDefi);
+
+defiSave.addEventListener('click', async () => {
+    const nouveau = defiInput.value.trim();
+    if (!nouveau) {
+        fermerModalDefi();
+        return;
+    }
+    try {
+        const r = await fetch('/api/defi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ defi: nouveau }),
+        });
+        const data = await r.json();
+        if (data.success) {
+            defiActuel = data.defi;
+        }
+    } catch {
+        // si ça échoue, on garde l'ancien défi en local
+    }
+    fermerModalDefi();
+});
 
 // Convertit la valeur du menu déroulant en joli nom affichable
 function formatPlayer(value) {
@@ -106,16 +170,26 @@ form.addEventListener('submit', async (event) => {
             // Nouvelle trinquade!
             responseDiv.classList.add('success');
             responseContent.textContent = `"${trinquade}" a été enregistrée.`;
+
+            // Chance rare et imprévisible de pouvoir changer le défi
+            if (Math.random() < CHANCE_CHANGER_DEFI) {
+                ouvrirModalDefi();
+            }
         } else {
-            // On a déjà trinqué à ça -> on affiche par qui et quand
+            // On a déjà trinqué à ça -> on affiche par qui, quand, et LE DÉFI
             responseDiv.classList.add('warning');
             let texte = `Vous avez déjà trinqué à "${trinquade}".`;
-            if (result.player || result.date) {
+            if (result.player === 'migration') {
+                // Trinquades importées avant la migration (auteur inconnu)
+                texte += `<br><span class="detail">Trinqué avant la migration (on ne sait plus par qui).</span>`;
+            } else if (result.player || result.date) {
                 const qui = formatPlayer(result.player);
                 const quand = formatDate(result.date);
                 texte += `<br><span class="detail">Trinqué par ${qui}${quand ? ` le ${quand}` : ''}.</span>`;
             }
-            texte += `<br>Défi à venir.`;
+            // Le défi en cours
+            const defiHtml = escapeHtml(defiActuel || 'Défi à venir.').replace(/\n/g, '<br>');
+            texte += `<br><br><span class="defi-label">Le défi</span><br>${defiHtml}`;
             responseContent.innerHTML = texte;
         }
 
