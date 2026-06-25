@@ -6,17 +6,34 @@ const responseDiv = document.getElementById('response');
 const responseContent = document.getElementById('responseContent');
 const photoDisplay = document.getElementById('photoDisplay');
 
+// Combinaisons de tags Flickr ciblant "vieux/vieille qui boit"
+const PHOTO_TAGS = [
+    'oldman,beer',
+    'elderly,wine',
+    'grandfather,drink',
+    'oldwoman,wine',
+    'pensioner,pub',
+    'oldman,cocktail',
+    'grandmother,champagne',
+    'seniors,cheers',
+];
+
 function loadPhoto() {
     photoDisplay.classList.add('loading');
-    // picsum.photos: photos aléatoires fiables, seed différent à chaque appel
-    const seed = Math.floor(Math.random() * 1000);
-    const url = `https://picsum.photos/seed/${seed}/800/1000`;
+    const tags = PHOTO_TAGS[Math.floor(Math.random() * PHOTO_TAGS.length)];
+    const rnd = Math.floor(Math.random() * 100000);
+    // LoremFlickr: vraies photos Flickr filtrées par tags. /all = doit matcher TOUS les tags.
+    const url = `https://loremflickr.com/800/1000/${tags}/all?random=${rnd}`;
+
     const img = new Image();
     img.onload = () => {
         photoDisplay.src = url;
         photoDisplay.classList.remove('loading');
     };
     img.onerror = () => {
+        // Repli: si LoremFlickr ne trouve rien, on met une photo fiable (picsum)
+        const fallback = `https://picsum.photos/seed/${rnd}/800/1000`;
+        photoDisplay.src = fallback;
         photoDisplay.classList.remove('loading');
     };
     img.src = url;
