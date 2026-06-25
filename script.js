@@ -42,21 +42,11 @@ form.addEventListener('submit', async (event) => {
         if (result.success) {
             // Nouvelle trinquade!
             responseDiv.classList.add('success');
-            responseContent.innerHTML = `
-                <div style="font-size: 2em; margin-bottom: 10px;">🎉</div>
-                <strong>Bravo!</strong><br>
-                Vous êtes libre jusqu'à la prochaine trinquade!<br>
-                <small style="opacity: 0.8;">"${trinquade}" a été enregistrée ✓</small>
-            `;
+            responseContent.textContent = `"${trinquade}" a été enregistrée.`;
         } else {
             // On a déjà trinqué à ça...
             responseDiv.classList.add('warning');
-            responseContent.innerHTML = `
-                <div style="font-size: 2em; margin-bottom: 10px;">⚠️</div>
-                <strong>Oh non!</strong><br>
-                Vous avez déjà trinqué à "${trinquade}"!<br>
-                <small style="opacity: 0.8;">Les défis arrivent bientôt...</small>
-            `;
+            responseContent.textContent = `Vous avez déjà trinqué à "${trinquade}". Défi à venir.`;
         }
 
         // Réinitialiser le formulaire
