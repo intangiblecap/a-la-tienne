@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À La Tienne 🍻</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🍻 À La Tienne 🍻</h1>
+            <p class="subtitle">Trinquez à quelque chose de nouveau!</p>
+
+            <form id="trinqueForm">
+                <!-- Liste déroulante: Qui trinque? -->
+                <div class="form-group">
+                    <label for="player">Qui trinque?</label>
+                    <select id="player" required>
+                        <option value="">-- Sélectionne quelqu'un --</option>
+                        <option value="sisiboubou">Sisiboubou 👤</option>
+                        <option value="alalboubou">Alalboubou 👤</option>
+                        <option value="autre">Autre personnage ➕</option>
+                    </select>
+                </div>
+
+                <!-- Barre de saisie: À quoi on trinque? -->
+                <div class="form-group">
+                    <label for="trinquade">À quoi trinquez-vous?</label>
+                    <input
+                        type="text"
+                        id="trinquade"
+                        placeholder="Ex: les sardines, les nuages, la bière..."
+                        required
+                    >
+                </div>
+
+                <!-- Bouton -->
+                <button type="submit" class="btn">🥂 TRINQUER! 🥂</button>
+            </form>
+
+            <!-- Réponse du système -->
+            <div id="response" class="response hidden">
+                <div id="responseContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
